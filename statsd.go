@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	maxPacketSize = 1400
+	packetSizeUDP = 0xffff
 )
 
 // StatsDSocketFactory is a layer over net.ListenPacket() to allow
@@ -32,6 +32,6 @@ func NewStatsDServer() *StatsDServer {
 		Address:       "127.0.0.1:8125",
 		Protocol:      "udp",
 		DefaultPrefix: "",
-		MaxPacketSize: maxPacketSize,
+		MaxPacketSize: packetSizeUDP,
 	}
 }
