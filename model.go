@@ -5,5 +5,10 @@ type State struct {
 }
 
 // StatsDConfig is a model with all configurations about the statsd
-type StatsDConfig struct {
+type StatsDServer struct {
+	Hostname      string
+	Address       string
+	Protocol      string
+	DefaultPrefix string
+	MaxPacketSize int
 }
