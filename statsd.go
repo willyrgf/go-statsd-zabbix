@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"os"
 )
@@ -32,6 +33,16 @@ func NewStatsDServer() *StatsDServer {
 		Address:       "127.0.0.1:8125",
 		Protocol:      "udp",
 		DefaultPrefix: "",
-		MaxPacketSize: packetSizeUDP,
 	}
+}
+
+// Run runs the server until context signals done
+func (s *StatsDServer) Run(ctx context.Context) error {
+	return s.RunWithSocket(ctx, socketFactory(s.Address, s.Protocol))
+}
+
+// RunWithSocket runs the server until context signals done
+// listering socket is created using socket
+func (s *StatsDServer) RunWithSocket(ctx context.Context, socket StatsDSocketFactory) error {
+	return nil
 }
