@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net"
 	"os"
 )
@@ -38,11 +39,31 @@ func NewStatsDServer() *StatsDServer {
 
 // Run runs the server until context signals done
 func (s *StatsDServer) Run(ctx context.Context) error {
-	return s.RunWithSocket(ctx, socketFactory(s.Address, s.Protocol))
+	return s.RunWithSocket(ctx, socketFactory(s.Protocol, s.Address))
 }
 
 // RunWithSocket runs the server until context signals done
 // listering socket is created using socket
 func (s *StatsDServer) RunWithSocket(ctx context.Context, socket StatsDSocketFactory) error {
+	conn, err := socket()
+	if err != nil {
+		<-ctx.Done()
+		return err
+	}
+	defer conn.Close()
+
+	for {
+		buffer := make([]byte, packetSizeUDP)
+		nbytes, addr, err := conn.ReadFrom(buffer)
+		if err != nil {
+			<-ctx.Done()
+			return err
+		}
+
+		go func(buffer []byte, remoteAddr net.Addr, nbytes int) {
+			log.Printf("packet-received: bytes=%+v from=%+v buffer=%+v", nbytes, remoteAddr, string(buffer))
+		}(buffer, addr, nbytes)
+	}
+
 	return nil
 }
