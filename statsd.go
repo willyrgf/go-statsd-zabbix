@@ -52,18 +52,32 @@ func (s *StatsDServer) RunWithSocket(ctx context.Context, socket StatsDSocketFac
 	}
 	defer conn.Close()
 
-	for {
-		buffer := make([]byte, packetSizeUDP)
-		nbytes, addr, err := conn.ReadFrom(buffer)
-		if err != nil {
-			<-ctx.Done()
-			return err
-		}
+	doneReceiver := make(chan error, 1)
+	doneRunMetrics := make(chan error, 1)
+	receivedDatagram := make(chan Datagram)
+	go ReceiverDatagram(ctx, conn, doneReceiver, receivedDatagram)
+	go RunMetrics(ctx, doneRunMetrics, receivedDatagram)
 
-		go func(buffer []byte, remoteAddr net.Addr, nbytes int) {
-			log.Printf("packet-received: bytes=%+v from=%+v buffer=%+v", nbytes, remoteAddr, string(buffer))
-		}(buffer, addr, nbytes)
+	select {
+	case <-ctx.Done():
+		log.Printf("RunWithSocket: ctx.Done()")
+	case <-doneReceiver:
 	}
+
+	//for {
+	//	log.Printf("RunWithSocket() for\n")
+	//	buffer := make([]byte, packetSizeUDP)
+	//	nbytes, addr, err := conn.ReadFrom(buffer)
+	//	log.Printf("RunWithSocket() after conn.ReadFrom\n")
+	//	if err != nil {
+	//		<-ctx.Done()
+	//		return err
+	//	}
+
+	//	go func(buffer []byte, remoteAddr net.Addr, nbytes int) {
+	//		log.Printf("packet-received: bytes=%+v from=%+v buffer=%+v", nbytes, remoteAddr, string(buffer))
+	//	}(buffer, addr, nbytes)
+	//}
 
 	return nil
 }

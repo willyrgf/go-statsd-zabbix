@@ -10,14 +10,23 @@ import (
 )
 
 // cancelOnInterrupt calls f when os.Interrupt or SIGTERM is received
-func cancelOnInterrupt(ctx context.Context, f context.CancelFunc) {
+func cancelOnInterrupt(ctx context.Context, cancel context.CancelFunc) {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(
+		c,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT,
+	)
 	go func() {
 		select {
 		case <-ctx.Done():
+			log.Printf("cancelOnInterrupt() <-ctx.Done(): ctx: %+v c: %+v", ctx, c)
 		case <-c:
-			f()
+			log.Printf("cancelOnInterrupt() pre cancel() <-c: ctx: %+v c: %+v", ctx, c)
+			cancel()
+			log.Printf("cancelOnInterrupt() <-c: ctx: %+v c: %+v", ctx, c)
 		}
 	}()
 }
