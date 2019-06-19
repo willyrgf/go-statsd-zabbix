@@ -24,9 +24,8 @@ func cancelOnInterrupt(ctx context.Context, cancel context.CancelFunc) {
 		case <-ctx.Done():
 			log.Printf("cancelOnInterrupt() <-ctx.Done(): ctx: %+v c: %+v", ctx, c)
 		case <-c:
-			log.Printf("cancelOnInterrupt() pre cancel() <-c: ctx: %+v c: %+v", ctx, c)
-			cancel()
 			log.Printf("cancelOnInterrupt() <-c: ctx: %+v c: %+v", ctx, c)
+			cancel()
 		}
 	}()
 }
