@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/spf13/viper"
 )
 
 // cancelOnInterrupt calls f when os.Interrupt or SIGTERM is received
@@ -30,8 +32,28 @@ func cancelOnInterrupt(ctx context.Context, cancel context.CancelFunc) {
 	}()
 }
 
+func readConfig() (*viper.Viper, error) {
+	var err error
+	v := viper.New()
+
+	v.AutomaticEnv()
+
+	return v, err
+}
+
 // run all application
 func run() error {
+	viper, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	state, err := NewState(viper)
+	if err != nil {
+		return err
+	}
+	log.Printf("state: %+v\n", state)
+
 	statsd := NewStatsDServer()
 
 	// make the context and control then

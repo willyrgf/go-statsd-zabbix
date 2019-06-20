@@ -7,6 +7,9 @@ import (
 
 // State is a model of all current state of app
 type State struct {
+	StorageType  string
+	Hostname     string
+	StatsDPrefix string
 }
 
 // StatsDConfig is a model with all configurations about the statsd
