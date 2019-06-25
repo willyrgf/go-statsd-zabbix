@@ -34,7 +34,7 @@ func NewStatsDConfig(viper *viper.Viper) (StatsDConfig, error) {
 
 	config.Hostname = h
 	config.StatsDPrefix = viper.GetString("STATSD_PREFIX")
-	config.StorageType = viper.GetString("STORAGE_TYPE")
+	config.StorageType = NewStorageType(viper.GetString("STORAGE_TYPE"))
 	config.StorageURL = viper.GetString("STORAGE_URL")
 
 	return config, err
@@ -75,7 +75,7 @@ func (s *StatsDServer) RunWithSocket(ctx context.Context, socket StatsDSocketFac
 	doneRunMetrics := make(chan error, 1)
 	receivedDatagram := make(chan Datagram)
 	go ReceiverDatagram(ctx, conn, doneReceiver, receivedDatagram)
-	go RunMetrics(ctx, doneRunMetrics, receivedDatagram)
+	go RunMetrics(ctx, doneRunMetrics, receivedDatagram, s)
 
 	select {
 	case <-ctx.Done():

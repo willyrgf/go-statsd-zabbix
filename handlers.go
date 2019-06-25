@@ -90,9 +90,23 @@ func (d Datagram) ParseMetric() (Metric, error) {
 	return m, err
 }
 
+// Save store the metric in the storage previous configured
+func (metric Metric) Save(statsd *StatsDServer) {
+	storage, err := NewStorage(statsd.Config.StorageType, statsd.Config.StorageURL)
+	if err != nil {
+		log.Printf("metric.Save(): err=%+v\n", err)
+		return
+	}
+
+	if err := storage.SaveMetric(metric); err != nil {
+		log.Printf("metric.Save(): err=%+v\n", err)
+		return
+	}
+}
+
 // RunMetrics receive all Datagram by a channel and run all operations
 // for proccess and save/storage this metric
-func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan Datagram) {
+func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan Datagram, statsd *StatsDServer) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -102,7 +116,7 @@ func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan 
 			if err != nil {
 				done <- err
 			}
-			log.Printf("RunMetrics(): metric: %+v\n", metric)
+			go metric.Save(statsd)
 		}
 	}
 }

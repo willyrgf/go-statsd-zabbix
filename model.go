@@ -7,7 +7,7 @@ import (
 
 // StatsDConfig is a model of all configs of app
 type StatsDConfig struct {
-	StorageType  string
+	StorageType  StorageType
 	StorageURL   string
 	Hostname     string
 	StatsDPrefix string

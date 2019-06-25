@@ -4,15 +4,29 @@ package main
 type StorageType int
 
 const (
+	// Nil is a null value to StorageType when dont have storage
+	Nil StorageType = iota
 	// JSON will store data in JSON files saved on disk
-	JSON StorageType = 0
+	JSON
 	// Zabbix will store in Zabbix Server configured
-	Zabbix StorageType = 1
+	Zabbix
 )
 
 // Storage represents all possible actions available to deal with data
 type Storage interface {
 	SaveMetric(Metric) error
+}
+
+// NewStorageType return a StorageType based on string
+func NewStorageType(s string) StorageType {
+	switch s {
+	case "JSON":
+		return JSON
+	case "Zabbix":
+		return Zabbix
+	default:
+		return Nil
+	}
 }
 
 // NewStorage returns a interface with the storage type choosed
