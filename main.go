@@ -48,13 +48,12 @@ func run() error {
 		return err
 	}
 
-	state, err := NewState(viper)
+	statsdConfig, err := NewStatsDConfig(viper)
 	if err != nil {
 		return err
 	}
-	log.Printf("state: %+v\n", state)
 
-	statsd := NewStatsDServer()
+	statsd := NewStatsDServer(statsdConfig)
 
 	// make the context and control then
 	ctx, cancelFunc := context.WithCancel(context.Background())

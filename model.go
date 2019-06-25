@@ -5,20 +5,22 @@ import (
 	"time"
 )
 
-// State is a model of all current state of app
-type State struct {
+// StatsDConfig is a model of all configs of app
+type StatsDConfig struct {
 	StorageType  string
+	StorageURL   string
 	Hostname     string
 	StatsDPrefix string
 }
 
-// StatsDConfig is a model with all configurations about the statsd
+// StatsDServer is a model with all configurations about the statsd
 type StatsDServer struct {
 	Hostname      string
 	Address       string
 	Protocol      string
 	DefaultPrefix string
 	MaxPacketSize int
+	Config        StatsDConfig
 }
 
 // Datagram is the UDP datagram packet received from the PacketConn

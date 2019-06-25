@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 const (
@@ -22,9 +24,25 @@ func socketFactory(protocol, addr string) StatsDSocketFactory {
 	}
 }
 
+// NewStatsDConfig start the StatsDConfig of the app with
+// all configurations about the statsd server
+func NewStatsDConfig(viper *viper.Viper) (StatsDConfig, error) {
+	var err error
+	config := StatsDConfig{}
+
+	h, err := os.Hostname()
+
+	config.Hostname = h
+	config.StatsDPrefix = viper.GetString("STATSD_PREFIX")
+	config.StorageType = viper.GetString("STORAGE_TYPE")
+	config.StorageURL = viper.GetString("STORAGE_URL")
+
+	return config, err
+}
+
 // NewStatsDServer get struct encapsulate all of parameters
 // for start the statsd server
-func NewStatsDServer() *StatsDServer {
+func NewStatsDServer(config StatsDConfig) *StatsDServer {
 	h, err := os.Hostname()
 	if err != nil {
 		panic(err)
@@ -34,6 +52,7 @@ func NewStatsDServer() *StatsDServer {
 		Address:       "127.0.0.1:8125",
 		Protocol:      "udp",
 		DefaultPrefix: "",
+		Config:        config,
 	}
 }
 
@@ -63,21 +82,6 @@ func (s *StatsDServer) RunWithSocket(ctx context.Context, socket StatsDSocketFac
 		log.Printf("RunWithSocket: ctx.Done()")
 	case <-doneReceiver:
 	}
-
-	//for {
-	//	log.Printf("RunWithSocket() for\n")
-	//	buffer := make([]byte, packetSizeUDP)
-	//	nbytes, addr, err := conn.ReadFrom(buffer)
-	//	log.Printf("RunWithSocket() after conn.ReadFrom\n")
-	//	if err != nil {
-	//		<-ctx.Done()
-	//		return err
-	//	}
-
-	//	go func(buffer []byte, remoteAddr net.Addr, nbytes int) {
-	//		log.Printf("packet-received: bytes=%+v from=%+v buffer=%+v", nbytes, remoteAddr, string(buffer))
-	//	}(buffer, addr, nbytes)
-	//}
 
 	return nil
 }

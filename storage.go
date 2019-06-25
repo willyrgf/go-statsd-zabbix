@@ -12,18 +12,19 @@ const (
 
 // Storage represents all possible actions available to deal with data
 type Storage interface {
+	SaveMetric(Metric) error
 }
 
 // NewStorage returns a interface with the storage type choosed
-func NewStorage(storageType StorageType) (Storage, error) {
+func NewStorage(storageType StorageType, storageURL string) (Storage, error) {
 	var storage Storage
 	var err error
 
 	switch storageType {
 	case JSON:
-		//storage, error = NewStorageJSON()
+		storage, err = NewStorageJSON(storageURL)
 	case Zabbix:
-		//storage, error = NewStorageZabbix()
+		//storage, err = NewStorageZabbix()
 	}
 
 	return storage, err

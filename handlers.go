@@ -102,7 +102,7 @@ func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan 
 			if err != nil {
 				done <- err
 			}
-			log.Printf("RunMetrics(): metric=%+v\n", metric)
+			log.Printf("RunMetrics(): metric: %+v\n", metric)
 		}
 	}
 }
