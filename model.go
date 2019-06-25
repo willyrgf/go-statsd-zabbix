@@ -39,6 +39,7 @@ type StatsDMetric struct {
 
 // Metric is a representation of all data collected with in each UDP datagram
 type Metric struct {
+	Hostname   string       `json:"hostname"`
 	SourceIP   string       `json:"source_ip"`
 	SourcePort string       `json:"source_port"`
 	Timestamp  time.Time    `json:"timestamp"`

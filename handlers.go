@@ -77,10 +77,11 @@ func (d Datagram) ParseStatsDMetric() (StatsDMetric, error) {
 
 // ParseMetric parse the Datagram received to a Metric
 // with all fields completed and ready for storage
-func (d Datagram) ParseMetric() (Metric, error) {
+func (d Datagram) ParseMetric(statsd *StatsDServer) (Metric, error) {
 	m := Metric{}
 	var err error
 
+	m.Hostname = statsd.Config.Hostname
 	m.SourceIP, m.SourcePort, err = net.SplitHostPort(d.RemoteAddr.String())
 	m.Timestamp = time.Now()
 	m.Prefix = ""
@@ -112,7 +113,7 @@ func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan 
 		case <-ctx.Done():
 			return
 		case d := <-receivedDatagram:
-			metric, err := d.ParseMetric()
+			metric, err := d.ParseMetric(statsd)
 			if err != nil {
 				done <- err
 			}

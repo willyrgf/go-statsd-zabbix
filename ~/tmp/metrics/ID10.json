@@ -1,0 +1,12 @@
+{
+	"hostname": "macht.local",
+	"source_ip": "127.0.0.1",
+	"source_port": "62192",
+	"timestamp": "2019-06-25T18:20:18.092615-03:00",
+	"prefix": "",
+	"stats": {
+		"name": "PJSIP.contacts.199;@1f9a0s9d78a09sd80a9s8.rtt",
+		"value": 2,
+		"type": "ms"
+	}
+}

@@ -30,9 +30,11 @@ func NewStatsDConfig(viper *viper.Viper) (StatsDConfig, error) {
 	var err error
 	config := StatsDConfig{}
 
-	h, err := os.Hostname()
+	config.Hostname = viper.GetString("HOSTNAME")
+	if len(config.Hostname) < 1 {
+		config.Hostname, err = os.Hostname()
+	}
 
-	config.Hostname = h
 	config.StatsDPrefix = viper.GetString("STATSD_PREFIX")
 	config.StorageType = NewStorageType(viper.GetString("STORAGE_TYPE"))
 	config.StorageURL = viper.GetString("STORAGE_URL")
