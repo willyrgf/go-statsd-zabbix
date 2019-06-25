@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net"
 	"os"
 
@@ -81,7 +80,6 @@ func (s *StatsDServer) RunWithSocket(ctx context.Context, socket StatsDSocketFac
 
 	select {
 	case <-ctx.Done():
-		log.Printf("RunWithSocket: ctx.Done()")
 	case <-doneReceiver:
 	}
 

@@ -54,12 +54,14 @@ func run() error {
 	}
 
 	statsd := NewStatsDServer(statsdConfig)
+	log.Printf("StatsDServer New(): Configuration set: %+v\n", statsd)
 
 	// make the context and control then
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 	cancelOnInterrupt(ctx, cancelFunc)
 
+	log.Printf("StatsDServer Run(): Start the UDP server: %+v", statsd.Address)
 	if err := statsd.Run(ctx); err != nil && err != context.Canceled {
 		return fmt.Errorf("statsd.Run() error: %+v", err)
 	}
@@ -68,7 +70,7 @@ func run() error {
 }
 
 func main() {
-	log.Printf("start go-statsd-zabbix")
+	log.Printf("Starting go-statsd-zabbix")
 	if err := run(); err != nil {
 		log.Fatalf("main() error run(): %+v\n", err)
 	}
