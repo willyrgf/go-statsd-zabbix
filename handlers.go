@@ -37,8 +37,31 @@ func ReceiverDatagram(ctx context.Context, conn net.PacketConn, done chan<- erro
 
 }
 
+// splitNameMetric split the raw name of metric to human name to this metric
+func splitNameMetric(n string) string {
+	var nameSplitted []string
+	var suffix string
+
+	nameSplitted = strings.Split(n, ".")
+	if len(nameSplitted) > 0 {
+		suffix = "." + nameSplitted[len(nameSplitted)-1]
+	}
+
+	nameSplitted = strings.Split(n, ";")
+	if len(nameSplitted) >= 2 {
+		return nameSplitted[0] + suffix
+	}
+
+	nameSplitted = strings.Split(n, "@")
+	if len(nameSplitted) >= 2 {
+		return nameSplitted[0] + suffix
+	}
+
+	return n
+}
+
 // handleDatagram handle the msg from udp datagram packet
-func handleDatagram(d Datagram) (name string, value float64, typeOf string, err error) {
+func handleDatagram(d Datagram) (nameRaw string, name string, value float64, typeOf string, err error) {
 	var msg []byte
 
 	if len(d.Buffer) == 0 {
@@ -58,7 +81,8 @@ func handleDatagram(d Datagram) (name string, value float64, typeOf string, err 
 	splittedMsg := strings.Split(sMsg, ":")
 	splittedValueType := strings.Split(splittedMsg[1], "|")
 
-	name = splittedMsg[0]
+	nameRaw = splittedMsg[0]
+	name = splitNameMetric(nameRaw)
 	typeOf = splittedValueType[1]
 	value, err = strconv.ParseFloat(splittedValueType[0], 64)
 
@@ -70,7 +94,9 @@ func (d Datagram) ParseStatsDMetric() (StatsDMetric, error) {
 	stats := StatsDMetric{}
 	var err error
 
-	stats.Name, stats.Value, stats.Type, err = handleDatagram(d)
+	stats.NameRaw, stats.Name, stats.Value, stats.Type, err = handleDatagram(d)
+
+	log.Printf("ParseStatsDMetric: stats: %+v\n", stats)
 
 	return stats, err
 }

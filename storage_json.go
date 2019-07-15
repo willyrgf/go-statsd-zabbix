@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	scribble "github.com/nanobox-io/golang-scribble"
 )
@@ -49,6 +50,7 @@ func getFileNameJSON(metric Metric) string {
 
 // SaveMetric save a new metric
 func (s *StorageJSON) SaveMetric(metric Metric) error {
+	log.Printf("metric: %+v\n", metric)
 	filename := getFileNameJSON(metric)
 	if err := s.db.Write(Collection, filename, metric); err != nil {
 		return err

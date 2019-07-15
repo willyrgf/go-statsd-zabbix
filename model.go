@@ -32,9 +32,10 @@ type Datagram struct {
 
 // StatsDMetric is a pure representation for a  statsd metric parsed from UDP datagram
 type StatsDMetric struct {
-	Name  string  `json:"name"`
-	Value float64 `json:"value"`
-	Type  string  `json:"type"`
+	Name    string  `json:"name"`
+	NameRaw string  `json:"name_raw"`
+	Value   float64 `json:"value"`
+	Type    string  `json:"type"`
 }
 
 // Metric is a representation of all data collected with in each UDP datagram

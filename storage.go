@@ -24,8 +24,9 @@ func NewStorageType(s string) StorageType {
 		return JSON
 	case "Zabbix":
 		return Zabbix
+	// the default STORAGE_TYPE if not set
 	default:
-		return Nil
+		return JSON
 	}
 }
 
