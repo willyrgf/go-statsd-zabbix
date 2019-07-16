@@ -48,11 +48,19 @@ func NewStatsDServer(config StatsDConfig) *StatsDServer {
 	if err != nil {
 		panic(err)
 	}
+
+	// initialization cache
+	cache, err := NewStorage(Memory, "")
+	if err != nil {
+		panic(err)
+	}
+
 	return &StatsDServer{
 		Hostname:      h,
 		Address:       "127.0.0.1:8125",
 		Protocol:      "udp",
 		DefaultPrefix: "",
+		Cache:         cache,
 		Config:        config,
 	}
 }

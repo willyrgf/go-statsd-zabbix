@@ -58,3 +58,14 @@ func (s *StorageJSON) SaveMetric(metric Metric) error {
 
 	return nil
 }
+
+// SaveItem save a new metric with SaveMetric
+func (s *StorageJSON) SaveItem(metric Metric) error {
+	return s.SaveMetric(metric)
+}
+
+// ItemExists check with item exist
+// not implemented to JSON, only function signature
+func (s *StorageJSON) ItemExists(metric Metric) (found bool) {
+	return found
+}

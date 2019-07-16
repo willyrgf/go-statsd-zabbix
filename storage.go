@@ -10,11 +10,15 @@ const (
 	JSON
 	// Zabbix will store in Zabbix Server configured
 	Zabbix
+	// Memory will store the data in-memory cache
+	Memory
 )
 
 // Storage represents all possible actions available to deal with data
 type Storage interface {
 	SaveMetric(Metric) error
+	SaveItem(Metric) error
+	ItemExists(Metric) bool
 }
 
 // NewStorageType return a StorageType based on string
@@ -36,6 +40,8 @@ func NewStorage(storageType StorageType, storageURL string) (Storage, error) {
 	var err error
 
 	switch storageType {
+	case Memory:
+		storage, err = NewStorageMemory()
 	case JSON:
 		storage, err = NewStorageJSON(storageURL)
 	case Zabbix:

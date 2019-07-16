@@ -20,6 +20,7 @@ type StatsDServer struct {
 	Protocol      string
 	DefaultPrefix string
 	MaxPacketSize int
+	Cache         Storage
 	Config        StatsDConfig
 }
 

@@ -131,6 +131,22 @@ func (metric Metric) Save(statsd *StatsDServer) {
 	}
 }
 
+// Process all the things about metric and save
+func (metric Metric) Process(statsd *StatsDServer) {
+	if !statsd.Cache.ItemExists(metric) {
+		log.Printf("metric.Process(): item not exist=%+v\n", metric.Stats.Name)
+		err := statsd.Cache.SaveItem(metric)
+		if err != nil {
+			log.Printf("metric.Process(): err=%+v\n", err)
+		}
+	}
+
+	log.Printf("metric.Process(): storage.ItemExists(metric): %+v", statsd.Cache.ItemExists(metric))
+
+	// Save the metric
+	metric.Save(statsd)
+}
+
 // RunMetrics receive all Datagram by a channel and run all operations
 // for proccess and save/storage this metric
 func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan Datagram, statsd *StatsDServer) {
@@ -143,7 +159,7 @@ func RunMetrics(ctx context.Context, done chan<- error, receivedDatagram <-chan 
 			if err != nil {
 				done <- err
 			}
-			go metric.Save(statsd)
+			go metric.Process(statsd)
 		}
 	}
 }
