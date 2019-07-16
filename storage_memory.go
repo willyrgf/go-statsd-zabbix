@@ -6,6 +6,7 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+// StorageMemory is the data storage layer using in-memory cache
 type StorageMemory struct {
 	cache *cache.Cache
 }
