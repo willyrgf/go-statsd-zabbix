@@ -40,7 +40,9 @@ func parseMetricToItemValue(metricName string) (valueOfMetric string) {
 func parseMetricToKey(metricName string) (key string) {
 	var suffix string
 
-	splitted := strings.Split(strings.ToLower(metricName), separatorOfMetric)
+	name := strings.ToLower(metricName)
+
+	splitted := strings.Split(name, separatorOfMetric)
 
 	// if th metric name dont have minimun count separators, use the first
 	if len(splitted) <= minMetricNameCountSep {
@@ -54,7 +56,7 @@ func parseMetricToKey(metricName string) (key string) {
 		}
 	}
 
-	key = fmt.Sprintf("%s[\"%s\"]", prefixKeyOfMetric+suffix, metricName)
+	key = fmt.Sprintf("%s[\"%s\"]", prefixKeyOfMetric+suffix, name)
 	return
 }
 
