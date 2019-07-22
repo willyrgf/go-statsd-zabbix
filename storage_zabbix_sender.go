@@ -54,7 +54,7 @@ func parseMetricToKey(metricName string) (key string) {
 		}
 	}
 
-	key = prefixKeyOfMetric + suffix
+	key = fmt.Sprintf("%s[\"%s\"]", prefixKeyOfMetric+suffix, metricName)
 	return
 }
 
