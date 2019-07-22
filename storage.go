@@ -45,7 +45,7 @@ func NewStorage(storageType StorageType, storageURL string) (Storage, error) {
 	case JSON:
 		storage, err = NewStorageJSON(storageURL)
 	case Zabbix:
-		//storage, err = NewStorageZabbix()
+		storage, err = NewStorageZabbixSender(storageURL)
 	}
 
 	return storage, err

@@ -55,11 +55,18 @@ func NewStatsDServer(config StatsDConfig) *StatsDServer {
 		panic(err)
 	}
 
+	// initialization of storage
+	storage, err := NewStorage(config.StorageType, config.StorageURL)
+	if err != nil {
+		panic(err)
+	}
+
 	return &StatsDServer{
 		Hostname:      h,
 		Address:       "127.0.0.1:8125",
 		Protocol:      "udp",
 		DefaultPrefix: "",
+		Storage:       storage,
 		Cache:         cache,
 		Config:        config,
 	}

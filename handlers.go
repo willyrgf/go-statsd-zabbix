@@ -119,29 +119,35 @@ func (d Datagram) ParseMetric(statsd *StatsDServer) (Metric, error) {
 
 // Save store the metric in the storage previous configured
 func (metric Metric) Save(statsd *StatsDServer) {
-	storage, err := NewStorage(statsd.Config.StorageType, statsd.Config.StorageURL)
-	if err != nil {
-		log.Printf("metric.Save(): err=%+v\n", err)
-		return
-	}
-
-	if err := storage.SaveMetric(metric); err != nil {
-		log.Printf("metric.Save(): err=%+v\n", err)
+	if err := statsd.Storage.SaveMetric(metric); err != nil {
+		log.Printf("metric.Save(): statsd.Storage.SaveMetric(metric) error: %+v\n", err)
 		return
 	}
 }
 
 // Process all the things about metric and save
 func (metric Metric) Process(statsd *StatsDServer) {
-	if !statsd.Cache.ItemExists(metric) {
-		log.Printf("metric.Process(): item not exist=%+v\n", metric.Stats.Name)
-		err := statsd.Cache.SaveItem(metric)
-		if err != nil {
-			log.Printf("metric.Process(): err=%+v\n", err)
-		}
+	var err error
+
+	// initialization for each metric
+	statsd.Storage, err = NewStorage(statsd.Config.StorageType, statsd.Config.StorageURL)
+	if err != nil {
+		log.Printf("metric.Process(): NewStorage error=%+v", err)
+		return
 	}
 
-	log.Printf("metric.Process(): storage.ItemExists(metric): %+v", statsd.Cache.ItemExists(metric))
+	// check if item exists
+	if !statsd.Cache.ItemExists(metric) {
+		// if not exists, create the item in the cache
+		err := statsd.Cache.SaveItem(metric)
+		if err != nil {
+			log.Printf("metric.Process(): statsd.Cache.SaveItem(metric) error: %+v\n", err)
+		}
+		// and create the item in the storage, if necessary
+		if err := statsd.Storage.SaveItem(metric); err != nil {
+			log.Printf("metric.Process(): statsd.Storage.SaveItem(metric) error: %+v\n", err)
+		}
+	}
 
 	// Save the metric
 	metric.Save(statsd)
