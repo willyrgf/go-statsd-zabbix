@@ -1,0 +1,47 @@
+#!/bin/sh
+
+#
+# PROVIDE: gostatsd
+# REQUIRE: NETWORKING SERVERS
+# KEYWORD:
+
+. /etc/rc.subr
+
+name="gostatsd"
+rcvar="${name}_enable"
+command="/usr/local/sbin/$name"
+pidfile="/var/run/${name}.pid"
+logfile="/var/log/${name}.log"
+
+load_rc_config $name
+: ${gostatsd_enable:="NO"}
+: ${gostatsd_storage="zabbix"}
+: ${gostatsd_storage_url="zabbix://127.0.0.1:10051"}
+
+start_cmd="gostatsd_start"
+stop_cmd="gostatsd_stop"
+status_cmd="gostatsd_status"
+
+gostatsd_start() {
+  STORAGE_TYPE="${gostatsd_storage}" STORAGE_URL="${gostatsd_storage_url}"  /usr/sbin/daemon -P ${pidfile} -r -o ${logfile} ${command}
+}
+
+gostatsd_stop() {
+  if [ -e "${pidfile}" ]; then
+    kill -s TERM `cat ${pidfile}`
+  else
+    echo "${name} is not running"
+  fi
+
+}
+
+gostatsd_status() {
+ if [ -e "${pidfile}" ]; then
+   echo "${name} is running as pid `cat ${pidfile}`"
+ else
+   echo "${name} is not running"
+ fi
+}
+
+run_rc_command "$1"
+
