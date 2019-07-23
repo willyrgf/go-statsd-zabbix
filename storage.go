@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // StorageType is a enum to define available storages types
 type StorageType int
 
@@ -22,16 +24,16 @@ type Storage interface {
 }
 
 // NewStorageType return a StorageType based on string
-func NewStorageType(s string) StorageType {
+func NewStorageType(s string) (stgType StorageType, err error) {
 	switch s {
 	case "JSON":
-		return JSON
+		stgType = JSON
 	case "Zabbix":
-		return Zabbix
-	// the default STORAGE_TYPE if not set
+		stgType = Zabbix
 	default:
-		return JSON
+		err = fmt.Errorf("STORAGE_TYPE is not supported: %s", s)
 	}
+	return
 }
 
 // NewStorage returns a interface with the storage type choosed
@@ -46,6 +48,8 @@ func NewStorage(storageType StorageType, storageURL string) (Storage, error) {
 		storage, err = NewStorageJSON(storageURL)
 	case Zabbix:
 		storage, err = NewStorageZabbixSender(storageURL)
+	default:
+		err = fmt.Errorf("STORAGE_TYPE is not supported: %v", storageType)
 	}
 
 	return storage, err

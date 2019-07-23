@@ -35,7 +35,7 @@ func NewStatsDConfig(viper *viper.Viper) (StatsDConfig, error) {
 	}
 
 	config.StatsDPrefix = viper.GetString("STATSD_PREFIX")
-	config.StorageType = NewStorageType(viper.GetString("STORAGE_TYPE"))
+	config.StorageType, err = NewStorageType(viper.GetString("STORAGE_TYPE"))
 	config.StorageURL = viper.GetString("STORAGE_URL")
 
 	return config, err
