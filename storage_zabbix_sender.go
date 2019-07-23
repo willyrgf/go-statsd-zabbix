@@ -26,17 +26,17 @@ type StorageZabbixSender struct {
 	Metrics []*zabbix.Metric
 }
 
-// parseTimestampToInt64
+// parseTimestampToInt64 parse time with timestamp format to int64
 func parseTimestampToInt64(t time.Time) int64 {
 	return t.UnixNano() / int64(time.Millisecond)
 }
 
-// parseMetricName
+// parseMetricToItemValue parse metric name to item value for create this item in item prototype
 func parseMetricToItemValue(metricName string) (valueOfMetric string) {
 	return fmt.Sprintf("{\"data\": [{\"{#ITEM}\": \"%s\"}]}", strings.ToLower(metricName))
 }
 
-// parseMetricToKey
+// parseMetricToKey parse metric name to key of item prototype
 func parseMetricToKey(metricName string) (key string) {
 	var suffix string
 
@@ -56,10 +56,11 @@ func parseMetricToKey(metricName string) (key string) {
 		}
 	}
 
-	key = fmt.Sprintf("%s[\"%s\"]", prefixKeyOfMetric+suffix, name)
+	key = fmt.Sprintf("%s[%s]", prefixKeyOfMetric+suffix, name)
 	return
 }
 
+// parseMetricValue parse the metric value considering type of value
 func parseMetricValue(metric Metric) (value string) {
 	switch metric.Stats.Type {
 	case "ms":
@@ -67,6 +68,17 @@ func parseMetricValue(metric Metric) (value string) {
 		value = fmt.Sprintf("%f", seconds)
 	default:
 		value = fmt.Sprintf("%f", metric.Stats.Value)
+	}
+	return
+}
+
+// itemTypeIsSupported check if the item type is supported
+func (s *StorageZabbixSender) itemTypeIsSupported(itemType string) (supported bool, err error) {
+	switch itemType {
+	case "ms":
+		supported = true
+	default:
+		err = fmt.Errorf("this item type is not supported: %s", itemType)
 	}
 	return
 }
@@ -119,11 +131,14 @@ func sendMetrics(s *StorageZabbixSender) {
 
 // SaveMetric save the metric on a item in zabbix server
 func (s *StorageZabbixSender) SaveMetric(metric Metric) error {
-	time := parseTimestampToInt64(metric.Timestamp)
+	if supported, err := s.itemTypeIsSupported(metric.Stats.Type); !supported || err != nil {
+		return err
+	}
+
 	key := parseMetricToKey(metric.Stats.Name)
 	value := parseMetricValue(metric)
 
-	s.Metrics = append(s.Metrics, zabbix.NewMetric(metric.Hostname, key, value, time))
+	s.Metrics = append(s.Metrics, zabbix.NewMetric(metric.Hostname, key, value))
 
 	s.Packet = zabbix.NewPacket(s.Metrics)
 
@@ -134,10 +149,13 @@ func (s *StorageZabbixSender) SaveMetric(metric Metric) error {
 
 // SaveItem save/create the item on zabbix server
 func (s *StorageZabbixSender) SaveItem(metric Metric) error {
-	time := parseTimestampToInt64(metric.Timestamp)
+	if supported, err := s.itemTypeIsSupported(metric.Stats.Type); !supported || err != nil {
+		return err
+	}
+
 	value := parseMetricToItemValue(metric.Stats.Name)
 
-	s.Metrics = append(s.Metrics, zabbix.NewMetric(metric.Hostname, keyOfItem, value, time))
+	s.Metrics = append(s.Metrics, zabbix.NewMetric(metric.Hostname, keyOfItem, value))
 
 	return nil
 }
