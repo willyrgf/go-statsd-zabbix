@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net"
 	"os"
 
@@ -46,19 +47,22 @@ func NewStatsDConfig(viper *viper.Viper) (StatsDConfig, error) {
 func NewStatsDServer(config StatsDConfig) *StatsDServer {
 	h, err := os.Hostname()
 	if err != nil {
-		panic(err)
+		log.Printf("NewStatsDServer(): GetHostname() error: %v", err)
+		os.Exit(1)
 	}
 
 	// initialization cache
 	cache, err := NewStorage(Memory, "")
 	if err != nil {
-		panic(err)
+		log.Printf("NewStatsDServer(): NewStorage() error: %v", err)
+		os.Exit(1)
 	}
 
 	// initialization of storage
 	storage, err := NewStorage(config.StorageType, config.StorageURL)
 	if err != nil {
-		panic(err)
+		log.Printf("NewStatsDServer(): NewStorage() error: %v", err)
+		os.Exit(1)
 	}
 
 	return &StatsDServer{
