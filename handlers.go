@@ -69,13 +69,13 @@ func handleDatagram(d Datagram) (nameRaw string, name string, value float64, typ
 		return
 	}
 
+	msg = d.Buffer[:d.NumberOfBytes]
+
 	idx := bytes.IndexByte(d.Buffer, '\n')
 	// protocol does not require line to end in \n
-	if idx == -1 { // \n not found
-		msg = d.Buffer[:d.NumberOfBytes]
+	if idx >= 0 { // \n not found
+		msg = d.Buffer[:idx]
 	}
-
-	msg = d.Buffer[:idx]
 
 	sMsg := string(msg)
 	splittedMsg := strings.Split(sMsg, ":")
