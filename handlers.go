@@ -125,9 +125,23 @@ func (metric Metric) Save(statsd *StatsDServer) {
 	}
 }
 
+// IsSupported check if the metric type is supported by storage
+func (metric Metric) IsSupported(statsd *StatsDServer) (supported bool) {
+	switch metric.Stats.Type {
+	case "ms":
+		supported = true
+	}
+	return
+}
+
 // Process all the things about metric and save
 func (metric Metric) Process(statsd *StatsDServer) {
 	var err error
+
+	if supported := metric.IsSupported(statsd); !supported {
+		log.Printf("metric.Process(): metric is not supported; metric.Stats=%+v", metric.Stats)
+		return
+	}
 
 	// initialization for each metric
 	statsd.Storage, err = NewStorage(statsd.Config.StorageType, statsd.Config.StorageURL)
