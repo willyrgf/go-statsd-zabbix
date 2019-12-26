@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/patrickmn/go-cache"
 )
@@ -15,7 +16,7 @@ type StorageMemory struct {
 func NewStorageMemory() (*StorageMemory, error) {
 	var err error
 	stg := new(StorageMemory)
-	stg.cache = cache.New(cache.NoExpiration, cache.NoExpiration)
+	stg.cache = cache.New(1*time.Hour, 2*time.Hour)
 
 	return stg, err
 }
@@ -35,7 +36,7 @@ func (s *StorageMemory) SaveItem(metric Metric) error {
 		return err
 	}
 
-	s.cache.Set(metric.Stats.Name, string(jsonMetric), cache.NoExpiration)
+	s.cache.Set(metric.Stats.Name, string(jsonMetric), cache.DefaultExpiration)
 	return err
 }
 
