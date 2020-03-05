@@ -34,3 +34,14 @@ gostatsd_storage="Zabbix"
 gostatsd_storage_url="zabbix://192.168.10.187:10051"
 EOF
 ```
+
+### Enable the statsd module on Asterisk (version >= 13)
+```
+[general]
+enabled = yes                   ; When set to yes, statsd support is enabled
+server = 127.0.0.1              ; server[:port] of statsd server to use.
+                                ; If not specified, the port is 8125
+add_newline = no                ; Append a newline to every event. This is
+                                ; useful if you want to run a fake statsd
+                                ; server using netcat (nc -lu 8125)
+```
