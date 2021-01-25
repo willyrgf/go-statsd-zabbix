@@ -2,6 +2,10 @@
 
 An implementation of statsd server to parse the metrics to the Zabbix Server.
 
+### Requirement
+- Zabbix Server >= 3.0
+- If using Asterisk >= 13.0
+
 ### For build:
 - Required: [Go compile >= 1.11](https://golang.org/doc/install)
 ```sh
@@ -37,6 +41,7 @@ EOF
 
 ### Enable the statsd module on Asterisk (version >= 13)
 ```
+# ${astetcdir}/statsd.conf
 [general]
 enabled = yes                   ; When set to yes, statsd support is enabled
 server = 127.0.0.1              ; server[:port] of statsd server to use.
